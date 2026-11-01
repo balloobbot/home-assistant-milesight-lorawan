@@ -39,6 +39,8 @@ devices across all configured LoRaWAN connections.
 
 Readings remain unknown until an uplink or status report supplies them.
 
+Brand images are included in the integration's `brand` directory.
+
 ## Development
 
 The device library is bundled under `custom_components/milesight_lorawan/_vendor`.
