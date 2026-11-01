@@ -35,5 +35,13 @@
         }
       }
     }
+  },
+  "exceptions": {
+    "command_timeout": {
+      "message": "Timed out waiting for the device to acknowledge the command."
+    },
+    "command_failed": {
+      "message": "Unable to send the command to the device."
+    }
   }
 }

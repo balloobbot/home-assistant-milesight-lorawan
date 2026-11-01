@@ -1,4 +1,4 @@
-"""Milesight models following the TTN TS201 and UC51x codecs."""
+"""Milesight device models."""
 
 from collections.abc import Iterator
 from datetime import datetime
@@ -185,7 +185,57 @@ class UC51x(MilesightDevice):
         return result
 
 
+class WS52x(MilesightDevice):
+    """Milesight WS52x smart socket, including WS523."""
+
+    identifiers = {"tts": ("milesight-iot", "ws52x")}
+    model_name = "WS52x"
+
+    def __init__(self, descriptor: DeviceDescriptor) -> None:
+        """Initialize socket readings."""
+        super().__init__(descriptor)
+        self.voltage: float | None = None
+        self.current: int | None = None
+        self.power: int | None = None
+        self.energy: int | None = None
+        self.power_factor: int | None = None
+        self.socket_on: bool | None = None
+
+    @staticmethod
+    @override
+    def decode(data: bytes) -> dict[str, float | int | bool | None]:
+        result: dict[str, float | int | bool | None] = {}
+        fields = {
+            (0x03, 0x74): ("voltage", 2),
+            (0x04, 0x80): ("power", 4),
+            (0x05, 0x81): ("power_factor", 1),
+            (0x06, 0x83): ("energy", 4),
+            (0x07, 0xC9): ("current", 2),
+            (0x08, 0x70): ("socket_on", 1),
+        }
+        lengths = {kind: length for kind, (_, length) in fields.items()}
+        lengths[(0xFF, 0x3F)] = 1  # Power outage notification.
+        for kind, value in records(data, lengths):
+            if kind not in fields:
+                continue
+            name = fields[kind][0]
+            raw = int.from_bytes(value, "little")
+            if name == "voltage":
+                result[name] = raw / 10
+            elif name == "socket_on":
+                result[name] = bool(raw & 1)
+            else:
+                result[name] = raw
+        return result
+
+    async def async_set_socket(self, on: bool) -> None:
+        """Switch the socket and wait for acknowledgement."""
+        await self.async_send_downlink(
+            data=bytes((0x08, int(on), 0xFF, 0xFF)), f_port=85
+        )
+
+
 class MilesightDevices(DeviceCollection[MilesightDevice]):
     """Supported Milesight devices."""
 
-    DEVICES = (TS201, UC51x)
+    DEVICES = (TS201, UC51x, WS52x)

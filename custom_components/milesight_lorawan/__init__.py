@@ -16,7 +16,7 @@ CONFIG_SCHEMA = cv.config_entry_only_config_schema(DOMAIN)
 type MilesightConfigEntry = ConfigEntry[
     DeviceManager[MilesightDevice, MilesightCoordinator]
 ]
-PLATFORMS = [Platform.SENSOR]
+PLATFORMS = [Platform.SENSOR, Platform.SWITCH]
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: MilesightConfigEntry) -> None:

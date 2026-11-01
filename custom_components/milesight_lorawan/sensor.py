@@ -14,6 +14,10 @@ from homeassistant.components.sensor import (
 from homeassistant.const import (
     PERCENTAGE,
     EntityCategory,
+    UnitOfElectricCurrent,
+    UnitOfElectricPotential,
+    UnitOfEnergy,
+    UnitOfPower,
     UnitOfPressure,
     UnitOfTemperature,
 )
@@ -22,7 +26,7 @@ from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 
 from . import MilesightConfigEntry
-from ._vendor.milesight_lorawan import TS201, MilesightDevice, UC51x
+from ._vendor.milesight_lorawan import TS201, MilesightDevice, UC51x, WS52x
 from .coordinator import MilesightCoordinator
 
 PARALLEL_UPDATES = 0
@@ -43,6 +47,46 @@ def valve_state(device: UC51x, channel: int) -> str | None:
 
 
 DESCRIPTIONS: tuple[MilesightSensorDescription[Any], ...] = (
+    MilesightSensorDescription[WS52x](
+        key="voltage",
+        device_types=(WS52x,),
+        device_class=SensorDeviceClass.VOLTAGE,
+        native_unit_of_measurement=UnitOfElectricPotential.VOLT,
+        state_class=SensorStateClass.MEASUREMENT,
+        value_fn=lambda device: device.voltage,
+    ),
+    MilesightSensorDescription[WS52x](
+        key="current",
+        device_types=(WS52x,),
+        device_class=SensorDeviceClass.CURRENT,
+        native_unit_of_measurement=UnitOfElectricCurrent.MILLIAMPERE,
+        state_class=SensorStateClass.MEASUREMENT,
+        value_fn=lambda device: device.current,
+    ),
+    MilesightSensorDescription[WS52x](
+        key="power",
+        device_types=(WS52x,),
+        device_class=SensorDeviceClass.POWER,
+        native_unit_of_measurement=UnitOfPower.WATT,
+        state_class=SensorStateClass.MEASUREMENT,
+        value_fn=lambda device: device.power,
+    ),
+    MilesightSensorDescription[WS52x](
+        key="energy",
+        device_types=(WS52x,),
+        device_class=SensorDeviceClass.ENERGY,
+        native_unit_of_measurement=UnitOfEnergy.WATT_HOUR,
+        state_class=SensorStateClass.TOTAL_INCREASING,
+        value_fn=lambda device: device.energy,
+    ),
+    MilesightSensorDescription[WS52x](
+        key="power_factor",
+        device_types=(WS52x,),
+        device_class=SensorDeviceClass.POWER_FACTOR,
+        native_unit_of_measurement=PERCENTAGE,
+        state_class=SensorStateClass.MEASUREMENT,
+        value_fn=lambda device: device.power_factor,
+    ),
     MilesightSensorDescription[TS201](
         key="temperature",
         device_types=(TS201,),

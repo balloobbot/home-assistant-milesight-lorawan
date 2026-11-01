@@ -21,11 +21,17 @@ Assistant `config/custom_components` directory and restart.
 
 | Model | Entities | Connections |
 | --- | --- | --- |
+| WS523 (WS52x profile) | Socket switch, voltage, current, power, energy, and power factor | The Things Network / The Things Stack |
 | TS201 | Temperature and battery percentage | The Things Network / The Things Stack |
 | UC511 / UC512 | Valve states, pulse counters, battery percentage, and pressure | The Things Network / The Things Stack |
 
 UC511 and UC512 valve states are read-only. This integration does not send valve
 commands. The optional pressure sensor is disabled by default.
+
+For WS523, select **Milesight WS52x Portable Socket** in the TTN device catalog.
+Socket commands wait up to 30 seconds for acknowledgement. The switch state
+changes when the socket reports it. A timeout leaves the queued command on
+the network server.
 
 Devices are matched by catalog identity. Renaming a custom profile to a supported
 model does not make it discoverable. One integration entry handles matching
@@ -41,7 +47,7 @@ It uses the shared LoRaWAN dependency provided by Home Assistant.
 Tests use Home Assistant's official pytest helpers and an in-memory connection.
 They cover discovery, decoded readings, entity identity, connection loss,
 reconnection, and removal.
-The TS201 fixture includes a captured physical-device uplink. UC51x tests use codec examples.
+The TS201 fixture includes a captured physical-device uplink. UC51x and WS523 tests use manufacturer codec examples. WS523 commands are tested with simulated acknowledgements.
 
 ```sh
 uv sync --group dev
@@ -55,3 +61,5 @@ The development environment pins Core and its test helpers to the same revision.
 CI also tests current Home Assistant `dev`.
 
 Payload references: [Milesight codecs](https://github.com/Milesight-IoT/SensorDecoders).
+
+The WS523 profile was identified from [LoRaWANDeviceProfiles](https://github.com/BenAhrdt/LoRaWANDeviceProfiles/tree/main/DeviceProfiles/Mileslight/WS523). Measurements and commands follow [Milesight’s WS523 protocol](https://github.com/Milesight-IoT/SensorDecoders/tree/main/ws-series/ws523).
