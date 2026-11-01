@@ -3,7 +3,7 @@
 # Milesight LoRaWAN
 
 Use Milesight devices with Home Assistant's LoRaWAN connections.
-Requires Home Assistant 2026.11 or newer.
+Requires Home Assistant 2026.11.0b0 or newer, including 2026.11 beta releases.
 
 ## Install
 
